@@ -598,12 +598,27 @@ module ActiveShipping
           when 1
             all_tracking_details.first
           when 0
-            raise ActiveShipping::Error, "The response did not contain tracking details"
+            message = "The response did not contain tracking details"
+            return TrackingResponse.new(
+              false,
+              message,
+              Hash.from_xml(response),
+              carrier: @@name,
+              xml: response,
+              request: last_request
+            )
           else
             all_unique_identifiers = xml.root.xpath('CompletedTrackDetails/TrackDetails/TrackingNumberUniqueIdentifier').map(&:text)
-            raise ActiveShipping::Error, "Multiple matches were found. Specify a unqiue identifier: #{all_unique_identifiers.join(', ')}"
+            message = "Multiple matches were found. Specify a unqiue identifier: #{all_unique_identifiers.join(', ')}"
+            return TrackingResponse.new(
+              false,
+              message,
+              Hash.from_xml(response),
+              carrier: @@name,
+              xml: response,
+              request: last_request
+            )
         end
-
 
         first_notification = tracking_details.at('Notification')
         severity = first_notification.at('Severity').text
