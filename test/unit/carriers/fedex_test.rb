@@ -327,6 +327,23 @@ class FedExTest < ActiveSupport::TestCase
     end
   end
 
+  def test_parsing_response_without_notifications
+    mock_response = xml_fixture('fedex/reply_without_notifications')
+
+    @carrier.expects(:commit).returns(mock_response)
+
+    response = @carrier.find_rates(
+      location_fixtures[:ottawa],
+      location_fixtures[:beverly_hills],
+      package_fixtures.values_at(:book, :wii),
+      :test => true
+    )
+
+    assert response.success?
+  end
+
+  ### find_tracking_info
+
   def test_response_transient_failure
     mock_response = xml_fixture('fedex/tracking_response_failure_code_9045')
     @carrier.expects(:commit).returns(mock_response)
@@ -350,23 +367,6 @@ class FedExTest < ActiveSupport::TestCase
     msg = 'Sorry, we are unable to process your tracking request.  Please contact Customer Service at 1.800.Go.FedEx(R) 800.463.3339.'
     assert_equal msg, error.message
   end
-
-  def test_parsing_response_without_notifications
-    mock_response = xml_fixture('fedex/reply_without_notifications')
-
-    @carrier.expects(:commit).returns(mock_response)
-
-    response = @carrier.find_rates(
-      location_fixtures[:ottawa],
-      location_fixtures[:beverly_hills],
-      package_fixtures.values_at(:book, :wii),
-      :test => true
-    )
-
-    assert response.success?
-  end
-
-  ### find_tracking_info
 
   def test_tracking_info_for_delivered_with_signature
     mock_response = xml_fixture('fedex/tracking_response_delivered_with_signature')
@@ -574,6 +574,8 @@ class FedExTest < ActiveSupport::TestCase
     assert_empty response.shipment_events
   end
 
+  ### create_shipment
+  
   def test_create_shipment
     confirm_response = xml_fixture('fedex/create_shipment_response')
     @carrier.stubs(:commit).returns(confirm_response)
