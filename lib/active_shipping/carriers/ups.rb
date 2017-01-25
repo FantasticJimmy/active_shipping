@@ -509,6 +509,8 @@ module ActiveShipping
     end
 
     def build_delivery_dates_request(origin, destination, packages, pickup_date, options={})
+      packages = packages.flatten
+      
       xml_builder = Nokogiri::XML::Builder.new do |xml|
 
         xml.TimeInTransitRequest do
@@ -523,7 +525,6 @@ module ActiveShipping
             xml.UnitOfMeasurement do
               xml.Code(options[:imperial] ? 'LBS' : 'KGS')
             end
-
             value = packages.inject(0) do |sum, package|
               sum + (options[:imperial] ? package.lbs.to_f : package.kgs.to_f )
             end
