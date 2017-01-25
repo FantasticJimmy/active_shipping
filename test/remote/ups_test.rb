@@ -393,6 +393,22 @@ class RemoteUPSTest < ActiveSupport::TestCase
     with_holidays(:ups) { assert_equal 1.business_days.after(today), ww_express_estimate.date }
   end
 
+  def test_delivery_date_estimates_to_have_valid_request_when_package_is_heavy_and_multiple_box
+    today = Date.current
+
+    response = @carrier.get_delivery_date_estimates(
+      location_fixtures[:new_york_with_name],
+      location_fixtures[:ottawa_with_name],
+      package_fixtures.values_at(:multiple_packages),
+      pickup_date=today,
+      {
+        :test => true
+      }
+    )
+    #this test is soly to test if the dates_request is valid, test would fail if missing or invalid request parameters.
+    assert response.success?
+  end
+
   def test_void_shipment
     # this is a test tracking number from the ups docs that always returns sucess
     response = @carrier.void_shipment('1Z12345E0390817264')
