@@ -48,6 +48,7 @@ module ActiveShipping
     end
 
     DEFAULT_SERVICES = {
+      "00" => "Pickup / Will call"
       "01" => "UPS Next Day Air",
       "02" => "UPS Second Day Air",
       "03" => "UPS Ground",
