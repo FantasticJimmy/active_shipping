@@ -939,7 +939,7 @@ module ActiveShipping
         xml.css('ServiceSummary').each do |service_summary|
           # Translate the Time in Transit Codes to the service codes used elsewhere
           service_name = service_summary.at('Service/Description').text
-          service_code = UPS::DEFAULT_SERVICE_NAME_TO_CODE[service_name]
+          service_code = service_summary.at('Service').at('Code').text
           date = Date.strptime(service_summary.at('EstimatedArrival/Date').text, '%Y-%m-%d')
           business_transit_days = service_summary.at('EstimatedArrival/BusinessTransitDays').text.to_i
           delivery_estimates << DeliveryDateEstimate.new(origin, destination, self.class.class_variable_get(:@@name),
